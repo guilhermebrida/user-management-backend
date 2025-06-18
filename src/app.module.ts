@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/user.entity'; // Exemplo
+import { UserModule } from './user/user.module'; 
 
 @Module({
   imports: [
@@ -11,15 +11,15 @@ import { User } from './user/user.entity'; // Exemplo
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        url: config.get('DATABASE_URL'),  // usa a URL completa
-        ssl: { rejectUnauthorized: false }, // necessário para NeonDB
+        url: config.get('DATABASE_URL'),  
+        ssl: { rejectUnauthorized: false }, 
         autoLoadEntities: true,
-        synchronize: false, // NÃO usar em produção, só dev
-        migrations: ['dist/migrations/*.js'],  // pasta compilada das migrations
-        migrationsRun: true,  // roda as migrations automaticamente no start
+        synchronize: false, 
+        migrations: ['dist/migrations/*.js'],  
+        migrationsRun: true, 
       }),
     }),
-    TypeOrmModule.forFeature([User]), // seus entities
+    UserModule,
   ],
 })
 export class AppModule {}
