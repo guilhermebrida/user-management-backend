@@ -11,8 +11,17 @@ export class UserService{
         private userRepo: Repository<User>,
     ){}
 
-    findAll(): Promise<User[]> {
-        return this.userRepo.find();
+    async findAll(filter: { role?: string; sortBy?: string; order?: 'ASC' | 'DESC' }) {
+        const { role, sortBy = 'created_at', order = 'ASC' } = filter;
+
+        const where = role ? { role } : {};
+
+        return this.userRepo.find({
+            where,
+            order: {
+            [sortBy]: order.toUpperCase(), 
+            },
+        });
     }
 
     async create(data: Partial<User>): Promise<User> {

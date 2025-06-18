@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Put, Body, UseGuards, Param, ParseIntPipe, Delete, ForbiddenException, Req } from "@nestjs/common";
+import { Controller, Get, Post, Put, Body, UseGuards, Param, ParseIntPipe, Delete, ForbiddenException, Req, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
-import { ApiOperation, ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { Roles } from "src/auth/roles.decorator";
 
 @ApiTags('Users')
@@ -22,13 +22,21 @@ export class UserController {
         return this.userService.findById(id);
   }
     
-    @Roles('admin')
-    @ApiBearerAuth()
-    @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: 'List all users (protected)' })
     @Get()
-    async findAll(): Promise<User[]> {
-        return this.userService.findAll();
+    @Roles('admin')
+    @ApiQuery({ name: 'role', required: false })
+    @ApiQuery({ name: 'sortBy', enum: ['name', 'created_at'], required: false })
+    @ApiQuery({ name: 'order', enum: ['asc', 'desc'], required: false })
+    async findAll(
+        @Query('role') role?: string,
+        @Query('sortBy') sortBy?: string,
+        @Query('order') order?: 'asc' | 'desc',
+    ) {
+        return this.userService.findAll({
+        role,
+        sortBy,
+        order: order?.toUpperCase() as 'ASC' | 'DESC',
+        });
     }
 
     // @Post()
