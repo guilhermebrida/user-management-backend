@@ -14,6 +14,12 @@ export class User {
   @Column()
   password: string;
 
+  @Column()
+  role: string;
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   created_at: Date;
+
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  update_at: Date;
 }
