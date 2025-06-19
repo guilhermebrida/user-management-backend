@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Put, Body, UseGuards, Param, ParseIntPipe, Delete, ForbiddenException, Req, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entity";
-import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
+import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { ApiOperation, ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
-import { Roles } from "src/auth/roles.decorator";
+import { Roles } from "../auth/roles.decorator";
 
 @ApiTags('Users')
 @ApiBearerAuth()
