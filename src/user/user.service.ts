@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Repository, LessThan } from "typeorm";
 import { User } from "./user.entity";
 import * as bcrypt from 'bcrypt'
 
@@ -58,6 +58,18 @@ export class UserService{
             throw new NotFoundException(`User with id ${id} not found`);
         }
         return user        
+    }
+
+    async findInactiveUsers(): Promise<User[]> {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - 30);
+
+        return this.userRepo.find({
+            where: [
+            { last_login: LessThan(cutoffDate) },
+            ],
+            order: { last_login: 'ASC' },
+        });
     }
 
 }

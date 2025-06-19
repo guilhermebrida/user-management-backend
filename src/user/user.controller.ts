@@ -61,4 +61,14 @@ export class UserController {
     async delete(@Param('id', ParseIntPipe) id: number){
         return this.userService.delete(id)
     }
+
+
+
+    @Roles('admin')
+    @Get('inactive')
+    @ApiTags('Users')
+    @ApiBearerAuth()
+    async getInactiveUsers() {
+        return this.userService.findInactiveUsers();
+    }
 }

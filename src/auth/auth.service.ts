@@ -14,6 +14,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+
+    async update(id: number, data: Partial<User>): Promise<User> {
+        await this.userRepo.update(id, data);
+        return this.userRepo.findOneOrFail({ where: { id } });
+    }
+
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.userRepo.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -24,6 +30,7 @@ export class AuthService {
 
   async login(email: string, password: string) {
     const user = await this.validateUser(email, password);
+    await this.userRepo.update(user.id, {last_login: new Date() });
     const payload = { sub: user.id, email: user.email, role: user.role };
     const token = await this.jwtService.signAsync(payload);
 

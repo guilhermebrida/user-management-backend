@@ -22,4 +22,7 @@ export class User {
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   update_at: Date;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  last_login: Date;
 }
