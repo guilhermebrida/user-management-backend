@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ResponseLoggerInterceptor } from './common/interceptors/response-logger.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -14,6 +15,13 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+    app.enableCors({
+    origin: '*',  
+    credentials: true,
+  });
+
+  app.useGlobalInterceptors(new ResponseLoggerInterceptor());
 
   await app.listen(3000);
 }
