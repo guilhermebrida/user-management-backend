@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, LessThan } from "typeorm";
 import { User } from "./user.entity";
 import * as bcrypt from 'bcrypt'
-
+import { UpdateProfileDto } from "./dto/profile-update.dto";
 @Injectable()
 export class UserService{
     constructor(
@@ -124,5 +124,29 @@ export class UserService{
         status: this.isUserOnline(user.last_login) ? 'online' : 'offline',
         }));
     }
+
+  async updateProfile(id: number, dto: UpdateProfileDto): Promise<User | null> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) {
+      return null;
+    }
+
+    if (dto.newPassword) {
+      if (!dto.currentPassword) {
+        throw new BadRequestException('Current password is required to change password');
+      }
+      const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+      if (!isMatch) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+      user.password = await bcrypt.hash(dto.newPassword, 10);
+    }
+
+    if (dto.name) {
+      user.name = dto.name;
+    }
+
+    return this.userRepo.save(user);
+  }
 
 }

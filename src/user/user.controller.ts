@@ -4,6 +4,7 @@ import { User } from "./user.entity";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { ApiOperation, ApiBearerAuth, ApiTags, ApiQuery } from "@nestjs/swagger";
 import { Roles } from "../auth/roles.decorator";
+import { UpdateProfileDto } from "./dto/profile-update.dto";
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -48,11 +49,13 @@ export class UserController {
     @ApiOperation({summary:'Update a user'})
     async update(@Param('id', ParseIntPipe) id: number, @Body() data: Partial<User>, @Req() req,){
         const user = req.user;
-        if (user.userId !== id) {
-            throw new ForbiddenException('Access denied');
+        console.log(user)
+        if (user.role === 'admin' || user.userId === id) {
+            return this.userService.update(id, data);
         }
-
-        return this.userService.update(id, data);
+        
+        throw new ForbiddenException('Access denied');
+        
     }
 
     @Delete(':id')
@@ -70,5 +73,21 @@ export class UserController {
     @ApiBearerAuth()
     async getInactiveUsers() {
         return this.userService.findInactiveUsers();
+    }
+
+
+
+    @Put(':id/profile')
+    @ApiOperation({ summary: 'Update user name and/or password' })
+    async updateProfile(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() updateProfileDto: UpdateProfileDto,
+      @Req() req
+    ) {
+      const user = req.user;
+      if (user.role !== 'admin' && user.userId !== id) {
+        throw new ForbiddenException('Access denied');
+      }
+      return this.userService.updateProfile(id, updateProfileDto);
     }
 }
