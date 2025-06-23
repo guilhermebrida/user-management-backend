@@ -10,19 +10,20 @@ async function bootstrap() {
     .setTitle('Exemplo NestJS + Swagger')
     .setDescription('API com documentação Swagger')
     .setVersion('1.0')
-    .addBearerAuth() 
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-    app.enableCors({
-    origin: '*',  
+  app.enableCors({
+    origin: '*',
     credentials: true,
   });
 
   app.useGlobalInterceptors(new ResponseLoggerInterceptor());
 
-  await app.listen(3000);
+  const port = process.env.PORT || 3000; 
+  await app.listen(port);
 }
 bootstrap();

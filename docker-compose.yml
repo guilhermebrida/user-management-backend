@@ -1,0 +1,17 @@
+
+services:
+  backend:
+    image: guilhermebrida/user-management-backend
+    container_name: user-management-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: "postgresql://users_owner:npg_ZdwiJ9N4Voak@ep-wispy-band-a83avmvw-pooler.eastus2.azure.neon.tech/users?sslmode=require"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
